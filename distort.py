@@ -158,6 +158,9 @@ def create_distortion_maps():
             newIndex_b = (new_pixel_b[0], new_pixel_b[1])
 
             m_r[clamp(*newIndex_r)] = col, row
+            m_g[clamp(*newIndex_g)] = col, row
+            m_b[clamp(*newIndex_b)] = col, row
+
     return m_r, m_g, m_b
 
 
@@ -165,15 +168,28 @@ def reverse_distort():
     m_r, m_g, m_b = create_distortion_maps()
     newImage: Image.Image = Image.new('RGB', (aImage.width, aImage.height))
     draw: ImageDraw.ImageDraw = ImageDraw.Draw(newImage)
+    new_pixels = {}
     for distorted, undistorted in m_r.items():
-        #print(distorted, undistorted)
         pixel = pixels[distorted[1]][distorted[0]]
+        if undistorted not in new_pixels:
+            new_pixels[undistorted] = [pixel[0],0,0]
+        else:
+            new_pixels[undistorted][0] = pixel[0]
+    for distorted, undistorted in m_g.items():
+        pixel = pixels[distorted[1]][distorted[0]]
+        if undistorted not in new_pixels:
+            new_pixels[undistorted] = [0, pixel[1], 0]
+        else:
+            new_pixels[undistorted][1] = pixel[1]
+    for distorted, undistorted in m_b.items():
+        pixel = pixels[distorted[1]][distorted[0]]
+        if undistorted not in new_pixels:
+            new_pixels[undistorted] = [0, 0, pixel[2]]
+        else:
+            new_pixels[undistorted][2] = pixel[2]
 
-        r = pixel[0], 0, 0
-        g = 0, pixel[1], 0
-        b = 0, 0, pixel[2]
-
-        draw.point((undistorted[0], undistorted[1]), fill=r)
+    for undistorted, rgb in new_pixels.items():
+        draw.point((undistorted[0], undistorted[1]), fill=tuple(rgb))
     Image._show(newImage)
 
 
