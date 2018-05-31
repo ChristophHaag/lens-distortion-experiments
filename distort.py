@@ -104,7 +104,7 @@ def clamp(col, row):
 
 def create_distortion_maps():
     m_r = {}
-    m_g =  {}
+    m_g = {}
     m_b = {}
     for row in range(height):
         for col in range(width):
@@ -193,4 +193,67 @@ def reverse_distort():
     Image._show(newImage)
 
 
-reverse_distort()
+def get_distorted_pixel(col, row):
+    #pixel = pixels[distorted[1]][distorted[0]]
+    # distance of this pixel from center, the norm
+    realxdist = col - centercol
+    realydist = row - centerrow
+
+    # normalized = divide by max value which we know to be half the image
+    xdist = realxdist / centercol
+    ydist = realydist / centerrow
+    radius = math.sqrt(xdist * xdist + ydist * ydist)
+
+    # still normalized
+    new_distances = (
+        xdist *
+        (distortion_k[3] +
+         distortion_k[2] * radius +
+         distortion_k[1] * radius * radius +
+         distortion_k[0] * radius * radius * radius
+         ),
+        ydist *
+        (distortion_k[3] +
+         distortion_k[2] * radius +
+         distortion_k[1] * radius * radius +
+         distortion_k[0] * radius * radius * radius
+         )
+    )
+
+    # to get the actual pixel position we need to
+    # 1. get from normalized [0-1] space by multiplying with the max, which is still half the size
+    # 2. scale that position with abberation scale for each color
+    # 3. add this x and y distance to the original center point
+    new_pixel_r = (
+        round(centercol + aberration_k[0] * new_distances[0] * centerrow),
+        round(centerrow + aberration_k[0] * new_distances[1] * centerrow)
+    )
+    new_pixel_g = (
+        round(centercol + aberration_k[1] * new_distances[0] * centerrow),
+        round(centerrow + aberration_k[1] * new_distances[1] * centerrow)
+    )
+    new_pixel_b = (
+        round(centercol + aberration_k[2] * new_distances[0] * centerrow),
+        round(centerrow + aberration_k[2] * new_distances[1] * centerrow)
+    )
+
+    # print(index, xdist, ydist, radius, new_pixel)
+    r = clamp(new_pixel_r[0], new_pixel_r[1])
+    g = clamp(new_pixel_g[0], new_pixel_g[1])
+    b = clamp(new_pixel_b[0], new_pixel_b[1])
+    return (pixels[r[1]][r[0]][0], pixels[g[1]][g[0]][1], pixels[b[1]][b[0]][2])
+
+
+def reverse_distort2():
+    newImage: Image.Image = Image.new('RGB', (aImage.width, aImage.height))
+    draw: ImageDraw.ImageDraw = ImageDraw.Draw(newImage)
+    for row in range(height):
+        for col in range(width):
+            pixel = get_distorted_pixel(col, row)
+            #print(pixel)
+            draw.point((col, row), fill=pixel)
+    Image._show(newImage)
+    newImage.save("newimage.png")
+
+
+reverse_distort2()
