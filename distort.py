@@ -134,17 +134,21 @@ def create_distortion_maps():
                      )
             )
 
+            # to get the actual pixel position we need to
+            # 1. get from normalized [0-1] space by multiplying with the max, which is still half the size
+            # 2. scale that position with abberation scale for each color
+            # 3. add this x and y distance to the original center point
             new_pixel_r = (
-                int(centercol + aberration_k[0] + new_distances[0] * centerrow),
-                int(centerrow + aberration_k[0] + new_distances[1] * centerrow)
+                int(centercol + aberration_k[0] * new_distances[0] * centerrow),
+                int(centerrow + aberration_k[0] * new_distances[1] * centerrow)
             )
             new_pixel_g = (
-                int(centercol + aberration_k[1] + new_distances[0] * centerrow),
-                int(centerrow + aberration_k[1] + new_distances[1] * centerrow)
+                int(centercol + aberration_k[1] * new_distances[0] * centerrow),
+                int(centerrow + aberration_k[1] * new_distances[1] * centerrow)
             )
             new_pixel_b = (
-                int(centercol + aberration_k[2] + new_distances[0] * centerrow),
-                int(centerrow + aberration_k[2] + new_distances[1] * centerrow)
+                int(centercol + aberration_k[2] * new_distances[0] * centerrow),
+                int(centerrow + aberration_k[2] * new_distances[1] * centerrow)
             )
 
             #print(index, xdist, ydist, radius, new_pixel)
