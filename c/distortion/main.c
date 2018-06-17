@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
 		}
 	}
 
-	int success = stbi_write_jpg("result.jpg", width, height, 3, out, 80);
+	int success = stbi_write_png("result.png", width, height, 3, out, width * 3);
 	printf("Write: %d\n", success);
 
 	stbi_image_free( rgb );

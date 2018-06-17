@@ -225,15 +225,15 @@ def get_distorted_pixel(col, row):
     # 2. scale that position with abberation scale for each color
     # 3. add this x and y distance to the original center point
     new_pixel_r = (
-        round(centercol + aberration_k[0] * new_distances[0] * centerrow),
+        round(centercol + aberration_k[0] * new_distances[0] * centercol),
         round(centerrow + aberration_k[0] * new_distances[1] * centerrow)
     )
     new_pixel_g = (
-        round(centercol + aberration_k[1] * new_distances[0] * centerrow),
+        round(centercol + aberration_k[1] * new_distances[0] * centercol),
         round(centerrow + aberration_k[1] * new_distances[1] * centerrow)
     )
     new_pixel_b = (
-        round(centercol + aberration_k[2] * new_distances[0] * centerrow),
+        round(centercol + aberration_k[2] * new_distances[0] * centercol),
         round(centerrow + aberration_k[2] * new_distances[1] * centerrow)
     )
 
